@@ -40,3 +40,6 @@ export const rolePermissions = core.table('role_permissions', {
   roleId: uuid('role_id').references(() => roles.id).notNull(),
   permissionId: uuid('permission_id').references(() => permissions.id).notNull(),
 });
+
+export type User = typeof users.$inferSelect;
+export type Organization = typeof organizations.$inferSelect;

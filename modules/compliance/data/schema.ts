@@ -26,3 +26,6 @@ export const evidence = compliance.table('evidence', {
   uploadedBy: uuid('uploaded_by').notNull(), // Soft link to @lexatech/core users table
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export type Obligation = typeof obligations.$inferSelect;
+export type Evidence = typeof evidence.$inferSelect;

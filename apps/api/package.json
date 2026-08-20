@@ -5,15 +5,18 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "dev": "node --watch --env-file-if-exists=../../.env --import tsx src/index.ts",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@lexatech/compliance": "workspace:*",
-    "@lexatech/core": "workspace:*",
+    "@lexatech/database": "*",
+    "@lexatech/compliance": "*",
+    "@lexatech/core": "*",
     "@hono/node-server": "^1.13.0",
     "hono": "^4.13.0"
   },
   "devDependencies": {
+    "@repo/typescript-config": "*",
     "tsx": "^4.19.0"
   }
 }

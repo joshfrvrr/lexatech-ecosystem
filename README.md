@@ -1,4 +1,20 @@
-# Turborepo starter
+# LexaTech Ecosystem
+
+LexaTech is an AI-powered regulatory compliance operating system for African businesses. Product and architecture decisions are governed by the [Product Charter](./PRODUCT.md).
+
+## Local setup
+
+LexaTech stores application records in a persistent PostgreSQL-compatible database; dashboard values are never populated with demo records. Local development uses embedded PGlite, while deployments can use an external PostgreSQL server.
+
+1. Copy .env.example to .env and set a random SESSION_SECRET.
+2. Run npm install.
+3. Run npm run dev. The local database and schemas are created automatically.
+
+For an external PostgreSQL deployment, set DATABASE_URL and run npm run db:push before starting the API.
+
+Open http://localhost:3000/register to create the first organisation and administrator. The web app proxies same-origin /api requests to the API on port 3002.
+
+Authentication uses an eight-hour, HttpOnly, SameSite=Strict signed session cookie. Compliance routes derive the organisation from that verified session and never accept a client-provided tenant ID.
 
 This Turborepo starter is maintained by the Turborepo core team.
 

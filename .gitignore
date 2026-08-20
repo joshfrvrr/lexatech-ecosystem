@@ -2,6 +2,8 @@
 
 # Dependencies
 node_modules
+.data
+rtk/
 .pnp
 .pnp.js
 

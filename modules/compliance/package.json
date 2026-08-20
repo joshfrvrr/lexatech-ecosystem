@@ -6,15 +6,19 @@
   "type": "module",
   "scripts": {
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@lexatech/database": "*",
+    "@hono/zod-validator": "^0.7.5",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.13.0",
     "pg": "^8.22.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@repo/typescript-config": "*",
     "@types/pg": "^8.20.4",
     "drizzle-kit": "^0.31.10"
   }

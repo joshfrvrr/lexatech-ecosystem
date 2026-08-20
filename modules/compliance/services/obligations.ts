@@ -1,59 +1,75 @@
-import { eq, sql } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { db } from '../data/db.js';
-import { obligations, statusEnum } from '../data/schema.js';
+import { obligations } from '../data/schema.js';
 
-// Define the exact shape of the data needed to create an obligation
+export type ObligationStatus = 'compliant' | 'at_risk' | 'non_compliant' | 'pending';
+
 export interface CreateObligationDTO {
   orgId: string;
   title: string;
   description?: string;
   dueDate?: Date;
+  status?: ObligationStatus;
 }
 
-/**
- * Creates a new compliance obligation for an organization.
- */
 export async function createObligation(data: CreateObligationDTO) {
-  const [newObligation] = await db.insert(obligations).values({
+  const [created] = await db.insert(obligations).values({
     orgId: data.orgId,
     title: data.title,
     description: data.description,
-    // Status defaults to 'pending' at the database level
     dueDate: data.dueDate,
+    status: data.status ?? 'pending',
   }).returning();
-
-  return newObligation;
+  return created;
 }
 
-/**
- * Calculates the overall compliance score for a specific organization (0 to 100).
- * Formula: (Compliant Obligations / Total Obligations) * 100
- */
-export async function calculateComplianceScore(orgId: string) {
-  // Fetch all obligations for this specific organization
-  const allObligations = await db
-    .select({
-      status: obligations.status,
-    })
-    .from(obligations)
-    .where(eq(obligations.orgId, orgId));
+export function listObligations(orgId: string) {
+  return db.select().from(obligations)
+    .where(eq(obligations.orgId, orgId))
+    .orderBy(asc(obligations.dueDate), asc(obligations.createdAt));
+}
 
-  const total = allObligations.length;
-  
-  // If they have no obligations, their score is 100% by default
-  if (total === 0) {
-    return { score: 100, total: 0, compliant: 0 };
-  }
+export async function updateObligation(
+  orgId: string,
+  obligationId: string,
+  data: Partial<Pick<CreateObligationDTO, 'title' | 'description' | 'dueDate' | 'status'>>,
+) {
+  const [updated] = await db.update(obligations)
+    .set({ ...data, updatedAt: new Date() })
+    .where(and(eq(obligations.id, obligationId), eq(obligations.orgId, orgId)))
+    .returning();
+  return updated ?? null;
+}
 
-  // Count how many are strictly 'compliant'
-  const compliantCount = allObligations.filter(ob => ob.status === 'compliant').length;
+export async function deleteObligation(orgId: string, obligationId: string) {
+  const [deleted] = await db.delete(obligations)
+    .where(and(eq(obligations.id, obligationId), eq(obligations.orgId, orgId)))
+    .returning({ id: obligations.id });
+  return deleted ?? null;
+}
 
-  // Calculate the percentage and round to the nearest whole number
-  const score = Math.round((compliantCount / total) * 100);
+export async function getDashboard(orgId: string) {
+  const items = await listObligations(orgId);
+  const now = new Date();
+  const inThirtyDays = new Date(now);
+  inThirtyDays.setDate(inThirtyDays.getDate() + 30);
+
+  const compliant = items.filter((item) => item.status === 'compliant').length;
+  const atRisk = items.filter((item) => item.status === 'at_risk' || item.status === 'non_compliant').length;
+  const overdue = items.filter((item) =>
+    item.dueDate && item.dueDate < now && item.status !== 'compliant'
+  ).length;
+  const upcoming = items.filter((item) =>
+    item.dueDate && item.dueDate >= now && item.dueDate <= inThirtyDays && item.status !== 'compliant'
+  ).length;
 
   return {
-    score,
-    total,
-    compliant: compliantCount,
+    score: items.length === 0 ? 100 : Math.round((compliant / items.length) * 100),
+    total: items.length,
+    compliant,
+    atRisk,
+    overdue,
+    upcoming,
+    obligations: items,
   };
 }
