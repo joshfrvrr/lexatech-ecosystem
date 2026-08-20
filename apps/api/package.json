@@ -1,0 +1,19 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "LexaTech Central API Gateway",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@lexatech/compliance": "workspace:*",
+    "@lexatech/core": "workspace:*",
+    "@hono/node-server": "^1.13.0",
+    "hono": "^4.13.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}

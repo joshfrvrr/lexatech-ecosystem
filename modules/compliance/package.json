@@ -1,0 +1,21 @@
+{
+  "name": "@lexatech/compliance",
+  "version": "1.0.0",
+  "description": "LexaTech Compliance Intelligence Module",
+  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.13.0",
+    "pg": "^8.22.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.20.4",
+    "drizzle-kit": "^0.31.10"
+  }
+}
